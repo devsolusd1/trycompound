@@ -8,7 +8,7 @@
     "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo"
   ],
   "launch": {
-    "devnet": "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo",
+    "devnet": null,
     "mainnet": null
   },
   "official": {
