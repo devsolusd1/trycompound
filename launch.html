@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Launch · Compound</title>
+  <meta name="description" content="Launch a test coin on Solana devnet with a wallet. Test coins, not real money.">
+  <meta name="theme-color" content="#12121C">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Crect width='7' height='7' fill='%2312121C'/%3E%3Crect x='1' y='1' width='4' height='4' fill='%23F5BD00'/%3E%3Crect x='5' y='1' width='1' height='4' fill='%236E45FF'/%3E%3Crect x='1' y='5' width='5' height='1' fill='%239595B2'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:ROND,wght@0..100,100..900&family=Instrument+Sans:wght@400;500&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script src="wallet.js" defer></script>
+  <script src="launch.js" defer></script>
+</head>
+<body class="sub">
+  <header class="head">
+    <a class="wordmark" id="wordmark" href="/"><svg class="px mark" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><rect x="0" y="0" width="4" height="1" fill="#F5BD00"/><rect x="4" y="0" width="1" height="1" fill="#6E45FF"/><rect x="0" y="1" width="4" height="1" fill="#F5BD00"/><rect x="4" y="1" width="1" height="1" fill="#6E45FF"/><rect x="0" y="2" width="4" height="1" fill="#F5BD00"/><rect x="4" y="2" width="1" height="1" fill="#6E45FF"/><rect x="0" y="3" width="4" height="1" fill="#F5BD00"/><rect x="4" y="3" width="1" height="1" fill="#6E45FF"/><rect x="0" y="4" width="5" height="1" fill="#9595B2"/></svg><span>compound</span></a>
+    <nav class="pages" aria-label="Pages">
+      <a href="/coins"><svg class="px ico" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><rect x="0" y="0" width="2" height="1" fill="#F5BD00"/><rect x="0" y="1" width="1" height="1" fill="#F5BD00"/><rect x="1" y="1" width="1" height="1" fill="#F54B00"/><rect x="2" y="1" width="1" height="1" fill="#2A2A3C"/><rect x="3" y="2" width="2" height="1" fill="#6E45FF"/><rect x="2" y="3" width="1" height="1" fill="#2A2A3C"/><rect x="3" y="3" width="2" height="1" fill="#6E45FF"/><rect x="0" y="4" width="1" height="1" fill="#F5BD00"/><rect x="1" y="4" width="1" height="1" fill="#2A2A3C"/></svg><span class="lbl">coins</span></a>
+      <a href="/launch" aria-current="page"><svg class="px ico" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><rect x="1" y="0" width="1" height="1" fill="#F5BD00"/><rect x="2" y="0" width="2" height="1" fill="#2A2A3C"/><rect x="0" y="1" width="1" height="1" fill="#F5BD00"/><rect x="4" y="1" width="1" height="1" fill="#2A2A3C"/><rect x="0" y="2" width="1" height="1" fill="#F5BD00"/><rect x="2" y="2" width="1" height="1" fill="#F5BD00"/><rect x="4" y="2" width="1" height="1" fill="#2A2A3C"/><rect x="0" y="3" width="1" height="1" fill="#F5BD00"/><rect x="4" y="3" width="1" height="1" fill="#2A2A3C"/></svg><span class="lbl">launch</span></a>
+    </nav>
+    <div class="wallet" id="wallet" hidden>
+      <button id="connect" type="button" aria-expanded="false" aria-controls="wallet-panel">connect</button>
+      <div class="panel" id="wallet-panel" hidden></div>
+    </div>
+  </header>
+
+  <main class="launch" id="launch-main" data-launch="/api/launch" data-upload="/api/upload">
+    <div class="l-top">
+      <h1>Launch a coin</h1>
+      <p>Test launches only, on Solana devnet. Coins made here are not real money. Mainnet opens later.</p>
+    </div>
+
+    <form class="l-form" id="l-form" novalidate>
+      <fieldset id="l-fields">
+        <div class="l-two">
+          <div class="l-f">
+            <div class="l-lab"><label for="l-name">Name</label><span class="l-count" id="l-name-count" hidden></span></div>
+            <input class="l-in" id="l-name" name="name" type="text" autocomplete="off" spellcheck="false" required aria-describedby="l-name-err l-name-count">
+            <p class="l-err" id="l-name-err" hidden></p>
+          </div>
+          <div class="l-f">
+            <div class="l-lab"><label for="l-symbol">Symbol</label><span class="l-count" id="l-symbol-count" hidden></span></div>
+            <input class="l-in" id="l-symbol" name="symbol" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" required aria-describedby="l-symbol-err l-symbol-count">
+            <p class="l-err" id="l-symbol-err" hidden></p>
+          </div>
+        </div>
+        <div class="l-f">
+          <div class="l-lab"><label for="l-image">Image</label></div>
+          <div class="l-pick">
+            <input class="vh" id="l-image" name="image" type="file" accept="image/png,image/jpeg,image/gif,image/webp" required aria-describedby="l-image-note l-image-err">
+            <label class="l-frame" for="l-image">
+              <span class="l-well"><img id="l-prev" alt="" width="96" height="96" hidden></span>
+              <svg class="px" id="l-frame" viewBox="0 0 34 34" width="102" height="102" shape-rendering="crispEdges" aria-hidden="true" focusable="false"></svg>
+              <span class="vh">Pick an image</span>
+            </label>
+            <p class="l-note" id="l-image-note">PNG, JPEG, GIF or WebP, up to 1 MB.</p>
+          </div>
+          <p class="l-err" id="l-image-err" hidden></p>
+        </div>
+        <div class="l-f">
+          <div class="l-lab"><label for="l-buy">First buy in SOL (optional)</label></div>
+          <input class="l-in" id="l-buy" name="firstBuy" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="l-buy-err">
+          <p class="l-err" id="l-buy-err" hidden></p>
+        </div>
+      </fieldset>
+    </form>
+
+    <figure class="art l-art">
+      <svg class="px drawing" id="l-gauge" viewBox="0 0 35 37" width="140" height="148" shape-rendering="crispEdges" aria-hidden="true" focusable="false"></svg>
+      <figcaption id="l-quote" aria-live="polite">No first buy: the curve opens empty. Its dots light as it fills.</figcaption>
+    </figure>
+
+    <div class="l-go" id="l-go">
+      <dl class="fx">
+        <div id="l-cost-row" hidden><dt>SOL in network rent and fees, about</dt><dd id="l-cost"></dd></div>
+        <div id="l-first-row" hidden><dt>SOL first buy</dt><dd id="l-first"></dd></div>
+        <div id="l-bal-row" hidden><dt>SOL on devnet in your wallet</dt><dd id="l-bal"></dd></div>
+      </dl>
+      <ul class="lines l-facts" aria-label="What a launch takes">
+        <li id="l-grad" hidden></li>
+        <li>Name, symbol and image can't be changed after launch.</li>
+        <li>Creators don't earn trading fees.</li>
+      </ul>
+      <div class="l-lines" aria-live="polite">
+        <p class="l-line" id="l-bal-err" hidden>Couldn't read your devnet balance.</p>
+        <p class="l-line" id="l-low" hidden>That's not enough for this launch. Get free test SOL at <a href="https://faucet.solana.com" target="_blank" rel="noopener noreferrer">faucet.solana.com</a>.</p>
+        <p class="l-line" id="l-mode" hidden>If your wallet shows a different balance, switch it to devnet. Phantom calls this Testnet Mode.</p>
+        <p class="l-line" id="l-why" hidden></p>
+      </div>
+      <button class="l-btn" id="l-btn" type="submit" form="l-form" disabled>Launch on devnet</button>
+      <p class="l-step" id="l-step" role="status" aria-live="polite" tabindex="-1"></p>
+    </div>
+
+    <section class="l-done" id="l-done" aria-labelledby="l-done-name" hidden>
+      <div class="fx-head"><img class="coin-img" id="l-done-img" alt="" width="32" height="32" hidden><h2 id="l-done-name" tabindex="-1"></h2></div>
+      <p>Your test coin is on devnet.</p>
+      <div class="fx-mint"><span>Mint</span><code id="l-done-mint"></code><button type="button" class="tog" id="l-done-copy">copy</button></div>
+      <p><a id="l-done-coins" href="/coins">See it on the coins page</a></p>
+      <p><a id="l-done-scan" href="https://solscan.io" target="_blank" rel="noopener noreferrer">See it on Solscan</a></p>
+      <p class="fine">New coins show on the coins page within a minute.</p>
+      <p><a href="/launch">Launch another</a></p>
+    </section>
+
+    <noscript><p class="fine">Launching needs JavaScript, which is off.</p></noscript>
+  </main>
+
+  <p class="foot"><span>compound</span> · Built on Meteora's bonding curve and DAMM v2 pools. Not made or endorsed by Meteora.</p>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "devnet": [
+    "CVo2E8M26oKV5PXu41F4N2hrQMoJnStpkpUGcbqFxb89",
+    "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo"
+  ],
+  "mainnet": [],
+  "demoSize": [
+    "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo"
+  ],
+  "launch": {
+    "devnet": "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo",
+    "mainnet": null
+  },
+  "official": {
+    "devnet": null,
+    "mainnet": null
+  }
+}
