@@ -1,0 +1,10 @@
+{
+  "name": "compound-site",
+  "private": true,
+  "description": "The Compound site: static pages plus the Vercel functions in api/. No \"type\" here on purpose: the functions are CommonJS, and the folder above says module.",
+  "dependencies": {
+    "@meteora-ag/dynamic-bonding-curve-sdk": "2.0.0",
+    "@solana/web3.js": "1.99.0",
+    "bn.js": "5.2.5"
+  }
+}
