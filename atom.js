@@ -179,13 +179,17 @@
     T: bitmap(['###', '.#.', '.#.', '.#.', '.#.'], ON),
     U: bitmap(['#.#', '#.#', '#.#', '#.#', '###'], ON),
     Y: bitmap(['#.#', '#.#', '.#.', '.#.', '.#.'], ON),
+    '1': bitmap(['.#.', '##.', '.#.', '.#.', '###'], ON),
     '2': bitmap(['##.', '..#', '.#.', '#..', '###'], ON),
     '5': bitmap(['###', '#..', '##.', '..#', '##.'], ON),
+    '0': bitmap(['###', '#.#', '#.#', '#.#', '###'], ON),
+    '6': bitmap(['###', '#..', '###', '#.#', '###'], ON),
+    '4': bitmap(['#.#', '#.#', '###', '..#', '..#'], ON),
     '$': bitmap(['.#.', '.##', '#..', '.#.', '..#', '##.', '.#.'], ON)
   };
   function glyphs(s) { var a = []; for (var i = 0; i < s.length; i++) a.push(GLYPH[s.charAt(i)]); return a; }
   var BUYG = glyphs('BUYBACK'), METG = glyphs('METEORA'), CMPG = glyphs('COMPOUND');
-  var GTG = glyphs('$5K$25K'), GTX = [31, 35, 39, 85, 89, 93, 97];
+  var GTG = glyphs('$10K$60K'), GTX = [29, 33, 37, 41, 85, 89, 93, 97], GTN = GTG.length, GTL = 4; // GTL: glyphs in the start label
   function drawGlyph(g, x, y, c) {
     var b = g.b, w = g.w;
     for (var i = 0; i < b.length; i++) if (b[i]) put(x + i % w, y + ((i / w) | 0), c);
@@ -402,11 +406,11 @@
         T.n = Math.min(MAXN, 63 + A); T.tiles = true;
         break;
       case REWIND:
-        T.lit = 0; T.c = 0; T.o[0] = T.o[1] = T.o[2] = 0; T.letters = 0; T.gtext = 7; T.n = 7;
+        T.lit = 0; T.c = 0; T.o[0] = T.o[1] = T.o[2] = 0; T.letters = 0; T.gtext = GTN; T.n = 7;
         break;
       case CURVE:
         u = f85(clamp01(p));
-        T.lit = Math.round(28 * u); T.c = 0; T.o[0] = T.o[1] = T.o[2] = 0; T.letters = 0; T.gtext = 7;
+        T.lit = Math.round(28 * u); T.c = 0; T.o[0] = T.o[1] = T.o[2] = 0; T.letters = 0; T.gtext = GTN;
         T.n = 7 + Math.round(12 * u);
         break;
       case GRAD:
@@ -414,7 +418,7 @@
         // Ring shut by u 0.2 and all three orbits drawn by 0.46, so the settled frame (u 0.5) is whole.
         T.c = Math.round(30 * clamp01((u - 0.02) / 0.18));
         for (k = 0; k < 3; k++) T.o[k] = Math.round(OLEN[k] * clamp01((u - 0.22 - 0.06 * k) / 0.12));
-        T.letters = 0; T.gtext = Math.round(7 * (1 - cT / 30)); T.n = 19;
+        T.letters = 0; T.gtext = Math.round(GTN * (1 - cT / 30)); T.n = 19;
         break;
       case COMP:
         u = p - 2;
@@ -890,7 +894,7 @@
     }
     for (i = 0; i < gtext; i++) {
       var g = GTG[i];
-      drawGlyph(g, GTX[i], g.h === 7 ? 96 : 97, i < 3 ? 6 : (lit === 28 ? 1 : 6));
+      drawGlyph(g, GTX[i], g.h === 7 ? 96 : 97, i < GTL ? 6 : (lit === 28 ? 1 : 6));
     }
   }
   function drawTile(x, y, seam) {
@@ -1218,7 +1222,7 @@
     computeTargets(st);
     lit = T.lit; cT = T.c; letters = T.letters; dotted = T.dotted;
     for (var k = 0; k < 3; k++) o[k] = T.o[k];
-    gtext = st === GRAD ? Math.round(7 * (1 - cT / 30)) : T.gtext;
+    gtext = st === GRAD ? Math.round(GTN * (1 - cT / 30)) : T.gtext;
     for (var i = 0; i < T.n; i++) place(chooseSlot(-1), false);
     R = isEra(st) ? n : 0;
     resetSats(); J = T.J; G = T.G;
@@ -1265,7 +1269,7 @@
     intro = false; ringFrac = 1; quiet(); J = 0; G = 0;
     var nn = 63, orbits = true, mol = ss >= 5;
     lit = 28; cT = 30; gtext = 0; dotted = 0; letters = 7;
-    if (ss === 1) { lit = 14; cT = 0; gtext = 7; nn = 13; orbits = false; letters = 0; }
+    if (ss === 1) { lit = 14; cT = 0; gtext = GTN; nn = 13; orbits = false; letters = 0; }
     else if (ss === 2) { nn = 19; letters = 0; }
     else if (ss === 3) nn = 43;
     else if (ss === 4) { orbits = false; dotted = DOTLEN; }
