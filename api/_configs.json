@@ -25,6 +25,16 @@
       "name": "Compound Stand-in",
       "test": true
     },
-    "mainnet": null
+    "mainnet": {
+      "mint": "BpWuEs3xUjQJ7ft53Szpm31Xe535RLNAvnka9a2z4hD2",
+      "config": "BqCqevMXbccXfh8CnZytwSmVdVfW91863r6ZdihSvzTt",
+      "pool": "F3kpngpF2RC1GBjqa3JA6ZGZUxgnGjeAbyizqDFZrnfq",
+      "wallet": "BCA6N2HGoC9jCwncF2jvW6dU2AKmspSN7WW3QTgtTZtZ",
+      "pot": "BnXdJwDAqvY6nqEYp2DtX8By3MR9jR2VZSpavSXqT76Z",
+      "tokenAccount": "FAqWYoe3ALcsMNz4aSYV8G5T1rmajL9MFmLZWubS9ppC",
+      "creator": "BCA6N2HGoC9jCwncF2jvW6dU2AKmspSN7WW3QTgtTZtZ",
+      "symbol": "COMPOUND",
+      "name": "Compound"
+    }
   }
 }
