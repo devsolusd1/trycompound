@@ -1,0 +1,976 @@
+/* Compound. One pixel atom, square-dot type, flat colours on #12121C.
+   Three layouts, chosen in CSS: TALL (default: phones, portrait), HALF (landscape small screens), WIDE (desktop). */
+
+:root {
+  --page: #12121C;
+  --raised: #181825;
+  --line: #2C2E49;
+  --line-2: #2A2A3C;
+  --line-3: #242540;
+  --text: #F5F5FF;
+  --muted: #9595B2;
+  --dim: #6C6C89;
+  --gold: #F5BD00;
+  --orange: #F54B00;
+  --violet: #6E45FF;
+
+  --mode: tall;
+  --cell: 3px;
+  --navzone: 0px;
+  --navh: calc(88px + env(safe-area-inset-bottom, 0px));
+  --band: calc(56px + min(calc(100vw - 32px), 40vh, 512px) + 12px);
+  --atom: var(--atom-css, min(62vh, 40vw, 768px));
+
+  --dots: "Doto", ui-monospace, monospace;
+  --sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  color-scheme: dark;
+}
+@supports (height: 1svh) {
+  :root {
+    --band: calc(56px + min(calc(100vw - 32px), 40svh, 512px) + 12px);
+    --atom: var(--atom-css, min(62svh, 40vw, 768px));
+  }
+}
+
+/* ---------- base ---------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  overflow-x: clip;
+  background: var(--page);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+@media (min-width: 600px) {
+  body { font-size: 17px; line-height: 1.55; }
+}
+
+h1, h2, p, ul, li, figure { margin: 0; padding: 0; }
+main { display: block; }
+a { color: inherit; }
+[hidden] { display: none !important; }
+strong { font-weight: 500; color: var(--text); }
+::selection { background: var(--line); color: var(--text); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.sec:focus { outline: none; }
+
+svg.px { display: block; flex: none; }
+
+/* Square-dot display face. */
+h1, h2, .wordmark span, .fig, .fig-big {
+  font-family: var(--dots);
+  font-variation-settings: "ROND" 0;
+  font-style: normal;
+  font-synthesis: none;
+  letter-spacing: 0;
+  color: var(--text);
+}
+h1 { font-weight: 700; font-size: clamp(34px, 4vw, 60px); line-height: 1.02; }
+h2 { font-weight: 700; font-size: clamp(28px, 2.6vw, 40px); line-height: 1.04; }
+h1, h2 { text-wrap: balance; }
+
+/* ---------- header: wordmark, pages, wallet ----------
+   TALL: fixed in the 56px top row of the opaque band. HALF and WIDE: on the landing it sits at the top of
+   the page and scrolls away with the cover, so no text ever passes under it. On /coins and /launch it is in flow. */
+
+.head {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 3;
+  pointer-events: none;
+}
+.head > * { pointer-events: auto; }
+
+.wordmark {
+  display: flex;
+  flex: none;
+  align-self: stretch;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  text-decoration: none;
+}
+.wordmark .mark { width: 20px; height: 20px; }
+.wordmark span { font-weight: 900; font-size: 20px; line-height: 1; }
+
+/* Pages: small pixel frames that share a border, like the film strip. */
+.pages { display: flex; flex: none; }
+.pages a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px 0 3px;
+  border: 1px solid var(--line-3);
+  background: var(--page);
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.pages a + a { margin-left: -1px; }
+.pages .ico { width: 20px; height: 20px; }
+.pages a[aria-current="page"] { position: relative; z-index: 1; background: var(--raised); border-color: var(--gold); color: var(--text); }
+@media (hover: hover) {
+  .pages a:not([aria-current="page"]):hover { position: relative; z-index: 1; border-color: var(--dim); }
+}
+.pages a:focus-visible { position: relative; z-index: 2; }
+
+/* Wallet: one framed button; its panel opens under it. Hidden until wallet.js runs.
+   It is the only item that may shrink, so an unusually wide address is cut with an ellipsis
+   instead of ever pushing the row past the screen. */
+.wallet { position: relative; flex: 0 1 auto; min-width: 0; margin-left: auto; }
+#connect {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 28px;
+  margin: 0;
+  padding: 0 7px;
+  border: 1px solid var(--line-3);
+  border-radius: 0;
+  background: var(--page);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+#connect[aria-expanded="true"] { background: var(--raised); }
+@media (hover: hover) {
+  #connect:hover { border-color: var(--dim); }
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 4;
+  width: 248px;
+  max-width: calc(100vw - 32px);
+  padding: 8px;
+  background: var(--raised);
+  border: 1px solid var(--line-3);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.panel .view > * + * { margin-top: 8px; }
+.panel .msg { margin-top: 8px; }
+.panel .msg:empty { margin-top: 0; }
+.panel .opts > * + * { margin-top: -1px; }
+.panel .opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 36px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid var(--line-3);
+  border-radius: 0;
+  background: var(--page);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.panel .opt img, .panel .opt .noicon { flex: none; width: 16px; height: 16px; }
+.panel .opt .noicon { border: 1px solid var(--line); }
+.panel .opt span { min-width: 0; overflow-wrap: anywhere; }
+@media (hover: hover) {
+  .panel .opt:hover { position: relative; z-index: 1; border-color: var(--dim); }
+}
+.panel .opt:focus-visible { position: relative; z-index: 2; }
+.panel .who { display: flex; align-items: center; gap: 8px; }
+.panel .who img { flex: none; width: 16px; height: 16px; }
+
+@media (max-width: 439px) {
+  /* Phones: the pages shrink to their icons; the words stay for screen readers. */
+  .pages a { width: 28px; padding: 0; justify-content: center; }
+  .pages .lbl {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+@media (max-width: 359px) {
+  .head { gap: 8px; }
+  #connect { padding: 0 6px; }
+}
+
+/* ---------- the atom (TALL: an opaque band at the top) ---------- */
+
+.stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--band);
+  display: block;
+  background: var(--page);
+  z-index: 2;
+  pointer-events: none;
+}
+.atom-slot {
+  margin: 56px auto 0;
+  width: min(calc(100% - 32px), 40vh, 512px);
+  width: min(calc(100% - 32px), 40svh, 512px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: start center;
+}
+#atom {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  pointer-events: auto;
+}
+
+.vh-probe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100vh;
+  height: 100svh;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ---------- sections ---------- */
+
+.sec {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  padding: var(--band) 16px var(--navh);
+  pointer-events: none;
+}
+.block, .foot { pointer-events: auto; }
+.block { justify-self: center; width: 100%; max-width: 520px; }
+.sec-cover { row-gap: 20px; }
+
+#top, #compound, #join, #launch { min-height: 100vh; min-height: 100svh; }
+#curve, #graduate { min-height: 90vh; min-height: 90svh; }
+#floor { min-height: 110vh; min-height: 110svh; }
+
+/* Vertical rhythm: every gap is a top margin. */
+.block > * + * { margin-top: 12px; }
+.block > h1 + *, .block > h2 + * { margin-top: 20px; }
+.block > .fine, .block > .legend { margin-top: 18px; }
+.block > .fine + .fine { margin-top: 8px; }
+.block > .cue, .block > .test { margin-top: 24px; }
+
+.white { color: var(--text); }
+.fine { font-size: 13px; line-height: 1.5; }
+.block a, .text a {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.cue { display: flex; align-items: center; gap: 10px; font-size: 13px; line-height: 1.5; }
+.cue .drop { position: relative; top: 0; width: 20px; height: 20px; animation: bob 1s steps(1) 5; }
+@keyframes bob {
+  0%, 49.99% { top: 0; }
+  50%, 100% { top: 4px; }
+}
+
+.legend { list-style: none; }
+.legend li { display: flex; align-items: center; gap: 14px; }
+.legend li + li { margin-top: 12px; }
+.legend .tile { width: 20px; height: 20px; }
+.fig { flex: none; width: 2.6em; font-weight: 800; font-size: 22px; line-height: 1; }
+.what { color: var(--muted); }
+
+.swatch { display: flex; align-items: center; gap: 10px; }
+.swatch .ring { width: 28px; height: 28px; }
+
+.fig-big { font-weight: 800; font-size: 22px; line-height: 1; color: var(--text); }
+.test > .fine { margin-top: 8px; }
+
+.foot {
+  margin-top: 40px;
+  justify-self: center;
+  width: 100%;
+  max-width: 520px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.foot span { font-weight: 500; color: var(--text); }
+
+/* ---------- film strip (TALL: an opaque band at the bottom) ---------- */
+
+.strip {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px max(16px, calc(50% - 180px)) calc(8px + env(safe-area-inset-bottom, 0px));
+  background: var(--page);
+}
+.strip a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--muted);
+}
+.strip .frame { display: block; border: 1px solid var(--line-3); padding: 4px; }
+.strip .icon { width: calc(13 * var(--cell)); height: calc(13 * var(--cell)); }
+.strip .meter {
+  display: flex;
+  gap: 1px;
+  width: calc(8 * var(--cell) + 15px);
+  height: calc(var(--cell) - 1px);
+  margin-top: 3px;
+}
+.strip .meter i { flex: 1; background: var(--line-2); }
+.strip .meter i.on { background: var(--gold); }
+.strip .label {
+  display: block;
+  margin-top: 4px;
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.01em;
+  text-align: center;
+  color: var(--muted);
+}
+
+.strip a.is-current .frame { background: var(--raised); border-color: var(--gold); }
+.strip a.is-current .label { color: var(--text); }
+.strip a.is-future:not(:hover):not(:focus-visible) .icon rect { fill: var(--dim); }
+@media (hover: hover) {
+  .strip a:not(.is-current):hover .frame { border-color: var(--dim); }
+  .strip a:hover { position: relative; z-index: 1; }
+}
+/* Where frames share a border (HALF, WIDE), the current one's gold edge and a focus ring paint on top. */
+.strip a.is-current { position: relative; z-index: 2; }
+.strip a:focus-visible { position: relative; z-index: 3; }
+.strip a:focus-visible { outline: none; }
+.strip a:focus-visible .frame { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* TALL at small heights (320x568 and the like): the cover has to fit between the two bands. */
+@media (max-width: 479px) and (max-height: 600px),
+       (max-height: 600px) and (max-aspect-ratio: 11/10) {
+  .strip .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .sec-cover .cue { display: none; }
+}
+
+/* ---------- HALF: atom in the left half, text in the right ---------- */
+
+@media (min-width: 600px) and (min-aspect-ratio: 11/10) and (max-width: 1199px),
+       (min-width: 480px) and (min-aspect-ratio: 11/10) and (max-height: 559px) {
+  :root { --mode: half; --cell: 4px; --navzone: 140px; --navh: 0px; }
+
+  .head {
+    position: absolute;
+    height: 64px;
+    padding: 0 calc(32px + env(safe-area-inset-right, 0px)) 0 calc(32px + env(safe-area-inset-left, 0px));
+    gap: 12px;
+  }
+  .wordmark span { font-size: 22px; }
+  .pages { margin-left: 6px; }
+  .pages a { height: 32px; padding: 0 10px 0 5px; font-size: 12px; line-height: 16px; }
+  #connect { height: 32px; padding: 0 10px; font-size: 12px; line-height: 16px; }
+
+  .stage {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: auto;
+    width: 50%;
+    height: auto;
+    z-index: 0;
+    display: grid;
+    place-items: center;
+    padding: 64px 0 var(--navzone) env(safe-area-inset-left, 0px);
+    background: none;
+  }
+  .atom-slot {
+    margin: 0;
+    width: min(calc(100vh - 64px - var(--navzone)), calc(50vw - 64px), 640px);
+    width: min(calc(100svh - 64px - var(--navzone)), calc(50vw - 64px), 640px);
+    place-items: center;
+  }
+
+  .sec { padding: 64px calc(32px + env(safe-area-inset-right, 0px)) var(--navzone) calc(50% + 32px); }
+  .block { justify-self: start; width: 100%; max-width: 440px; }
+  .foot { justify-self: start; max-width: 440px; }
+
+  .fig { font-size: 26px; }
+  .fig-big { font-size: 26px; }
+
+  .strip {
+    left: 0;
+    right: auto;
+    width: 50%;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    justify-content: center;
+    gap: 0;
+    z-index: 3;
+    padding: 0 0 0 env(safe-area-inset-left, 0px);
+    background: none;
+  }
+  /* one strip of film: neighbouring frames share one border */
+  .strip a { width: calc(13 * var(--cell) + 14px); }
+  .strip a + a { margin-left: -1px; }
+  .strip .frame { padding: 6px; }
+  .strip .meter { margin-top: 4px; }
+  .strip .label { margin-top: 6px; font-size: 12px; line-height: 16px; white-space: nowrap; }
+}
+
+@media (min-width: 600px) and (min-aspect-ratio: 11/10) and (max-width: 1199px) and (max-height: 639px),
+       (min-width: 480px) and (min-aspect-ratio: 11/10) and (max-height: 559px) {
+  :root { --cell: 3px; --navzone: 116px; }
+  .strip { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); gap: 6px; }
+  /* at cell 3 a frame is narrower than its 12px label, so the frames stand apart */
+  .strip a { width: auto; }
+  .strip a + a { margin-left: 0; }
+}
+
+@media (min-width: 480px) and (min-aspect-ratio: 11/10) and (max-height: 480px) {
+  :root { --navzone: 96px; }
+  .head { height: 48px; }
+  .stage { padding-top: 48px; }
+  .sec { padding-top: 48px; }
+  .strip { gap: 0; }
+  .strip a { width: calc(13 * var(--cell) + 14px); }
+  .strip a + a { margin-left: -1px; }
+  .atom-slot {
+    width: min(calc(100vh - 48px - var(--navzone)), calc(50vw - 64px), 640px);
+    width: min(calc(100svh - 48px - var(--navzone)), calc(50vw - 64px), 640px);
+  }
+  .strip .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* HALF under 600px wide: the left half is 240 to 299px, so five frames close up (5 x 47 - 4 = 231px),
+   and the header's pages shrink to their icons as on phones. */
+@media (min-width: 480px) and (max-width: 599px) and (min-aspect-ratio: 11/10) and (max-height: 559px) {
+  .pages a { width: 32px; padding: 0; justify-content: center; }
+  .pages .lbl {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .strip { gap: 0; }
+  .strip a { width: calc(13 * var(--cell) + 8px); }
+  .strip a + a { margin-left: -1px; }
+  .strip .frame { padding: 3px; }
+  .strip .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ---------- WIDE: atom fixed in the middle, text on its flanks ---------- */
+
+@media (min-width: 1200px) and (min-height: 560px) {
+  :root { --mode: wide; --cell: 4px; --navh: 0px; }
+
+  /* 78px tall, so the wordmark's line sits at y 28 to 50 as before */
+  .head { position: absolute; height: 78px; padding: 0 40px; gap: 12px; }
+  .wordmark { align-self: center; }
+  .wordmark span { font-size: 22px; }
+  .pages { margin-left: 6px; }
+  .pages a { height: 32px; padding: 0 10px 0 5px; font-size: 12px; line-height: 16px; }
+  #connect { height: 32px; padding: 0 10px; font-size: 12px; line-height: 16px; }
+
+  .stage {
+    inset: 0 0 96px 0;
+    height: auto;
+    z-index: 0;
+    display: grid;
+    place-items: center;
+    background: none;
+  }
+  .atom-slot {
+    margin: 0;
+    width: min(62vh, 40vw, 768px);
+    width: min(62svh, 40vw, 768px);
+    place-items: center;
+  }
+
+  .sec {
+    grid-template-columns: 1fr var(--atom) 1fr;
+    column-gap: 64px;
+    padding: 0 40px 96px;
+  }
+  .block { max-width: none; }
+  .block.left { grid-column: 1; justify-self: end; width: min(380px, 100%); }
+  .block.right { grid-column: 3; justify-self: start; width: min(380px, 100%); }
+  .sec-cover .block { grid-row: 1; align-self: center; }
+
+  .fig { font-size: 26px; }
+  .fig-big { font-size: 26px; }
+
+  /* the launch block is on the right flank; the footer sits under it, at the bottom of the screen */
+  #launch .foot {
+    position: absolute;
+    bottom: 32px;
+    left: calc(50% + var(--atom) / 2 + 64px);
+    width: min(380px, calc(50% - var(--atom) / 2 - 104px));
+    max-width: none;
+    margin: 0;
+  }
+
+  .strip {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: max-content;
+    justify-content: flex-start;
+    gap: 0;
+    z-index: 3;
+    padding: 0;
+    background: none;
+  }
+  .strip a { width: calc(13 * var(--cell) + 14px); }
+  .strip a + a { margin-left: -1px; }
+  .strip .frame { padding: 6px; }
+  .strip .meter { margin-top: 4px; }
+  .strip .label { margin-top: 6px; font-size: 12px; line-height: 16px; white-space: nowrap; }
+}
+
+/* ---------- /coins and /launch (body.sub): no atom, no strip ---------- */
+
+.sub {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+.sub .head { position: relative; flex: none; }
+.sub main {
+  flex: 1 0 auto;
+  display: grid;
+  align-content: center;
+  justify-content: center;
+  grid-template-columns: minmax(0, 520px);
+  row-gap: 40px;
+  padding: 40px 16px 56px;
+}
+.text > * + * { margin-top: 12px; }
+.text > h1 + * { margin-top: 20px; }
+.text > .fine, .text > .lines { margin-top: 18px; }
+.art { display: grid; justify-items: start; row-gap: 14px; }
+.art .drawing { width: 140px; height: auto; }
+.art figcaption { font-size: 13px; line-height: 1.5; }
+
+.lines { list-style: none; }
+.lines li { position: relative; padding-left: 16px; }
+.lines li + li { margin-top: 10px; }
+/* a positioned marker, so inline <strong> stays in the sentence's flow */
+.lines li::before { content: ""; position: absolute; left: 0; top: 9px; width: 4px; height: 4px; background: var(--dim); }
+@media (min-width: 600px) {
+  .lines li::before { top: 11px; }
+}
+
+.sub .foot {
+  margin: 0;
+  width: auto;
+  max-width: none;
+  padding: 0 16px calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 760px), (min-width: 540px) and (min-aspect-ratio: 11/10) {
+  .sub main { grid-template-columns: 140px minmax(0, 440px); column-gap: 40px; align-items: center; }
+  .sub main .art { grid-column: 1; grid-row: 1; }
+  .sub main .text { grid-column: 2; grid-row: 1; }
+}
+/* large screens: the drawing at 8 px cells (35 cells), still whole pixels */
+@media (min-width: 1000px) and (min-height: 640px) {
+  .sub main { grid-template-columns: 280px minmax(0, 440px); }
+  .art .drawing { width: 280px; }
+}
+@media (min-width: 600px) and (min-aspect-ratio: 11/10) and (max-width: 1199px),
+       (min-width: 480px) and (min-aspect-ratio: 11/10) and (max-height: 559px) {
+  .sub main { padding: 32px calc(32px + env(safe-area-inset-right, 0px)) 48px calc(32px + env(safe-area-inset-left, 0px)); }
+  .sub .foot { padding: 0 calc(32px + env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) calc(32px + env(safe-area-inset-left, 0px)); }
+}
+@media (min-width: 900px) {
+  .sub main { column-gap: 64px; }
+}
+@media (min-width: 1200px) and (min-height: 560px) {
+  .sub main { padding: 40px 40px 64px; }
+  .sub .foot { padding: 0 40px 32px; }
+}
+
+/* ---------- /coins: the live molecule (body.sub, main.coins) ----------
+   PHONES: the molecule square and full width, its details under it, the list under that.
+   From 1000px: the details beside the molecule. coins.js sizes the canvas in whole device pixels. */
+
+.sub main.coins {
+  display: block;
+  width: 100%;
+  max-width: 1188px;
+  margin: 0 auto;
+  padding: 28px 16px 56px;
+}
+.coins-top { max-width: 640px; }
+.coins-top > * + * { margin-top: 10px; }
+.coins-top > h1 + * { margin-top: 18px; }
+.coins .status { color: var(--text); }
+
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.mol { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 28px; margin-top: 28px; }
+.mol-fig { display: grid; row-gap: 12px; min-width: 0; }
+.mol-box { display: flex; justify-content: center; width: 100%; min-width: 0; }
+#mol {
+  display: block;
+  flex: none;
+  width: 256px;
+  height: 256px;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.mol-fig figcaption { text-align: center; }
+
+.facts { min-width: 0; max-width: 520px; }
+.facts > div > * + * { margin-top: 12px; }
+.facts h2 { font-size: 24px; line-height: 1.12; overflow-wrap: anywhere; }
+.facts h2:focus { outline: none; }
+.facts > div > h2 + * { margin-top: 8px; }
+.facts a {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.fx-sym { font-weight: 500; overflow-wrap: anywhere; }
+
+.key { list-style: none; }
+.key li { display: flex; align-items: flex-start; gap: 12px; }
+.key li + li { margin-top: 12px; }
+.sw { display: block; flex: none; width: 32px; height: 32px; }
+.sw svg { display: block; width: 32px; height: 32px; }
+
+/* a figure, then its word, as on the landing; dt stays first in the DOM so it is read in order */
+dl.fx { margin: 0; display: grid; row-gap: 10px; }
+dl.fx div { display: flex; flex-direction: row-reverse; justify-content: flex-end; align-items: baseline; gap: 10px; }
+dl.fx dt { color: var(--muted); }
+dl.fx dd {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--dots);
+  font-variation-settings: "ROND" 0;
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: left;
+  white-space: nowrap;
+}
+.fx-mint { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+.fx-mint code { font-family: var(--sans); font-variant-numeric: tabular-nums; font-size: 13px; color: var(--text); }
+
+/* small square toggles: the sort, the copy button */
+.tog {
+  display: block;
+  height: 28px;
+  margin: 0;
+  padding: 0 9px;
+  border: 1px solid var(--line-3);
+  border-radius: 0;
+  background: var(--page);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.tog[aria-pressed="true"] { position: relative; z-index: 1; background: var(--raised); border-color: var(--gold); color: var(--text); }
+@media (hover: hover) {
+  .tog:not([aria-pressed="true"]):hover { position: relative; z-index: 1; border-color: var(--dim); }
+}
+.tog:focus-visible { position: relative; z-index: 2; }
+.sort { display: flex; flex: none; }
+.sort .tog + .tog { margin-left: -1px; }
+
+.list { margin-top: 56px; max-width: 860px; }
+.list-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 16px; }
+.rows { list-style: none; margin: 18px 0 0; padding: 0; }
+.rows li + li { margin-top: 2px; }
+.row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--page);
+  border-radius: 0;
+  background: var(--page);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.row .ico { display: block; width: 32px; height: 32px; }
+.row .ico svg { display: block; width: 32px; height: 32px; }
+.row .who { display: flex; flex-direction: column; min-width: 0; }
+.row .sym { color: var(--text); font-weight: 500; overflow-wrap: anywhere; }
+.row .nm { font-size: 13px; overflow-wrap: anywhere; }
+.row .nm:empty { display: none; }
+.row .st { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.row .sol { color: var(--text); text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.row[aria-pressed="true"] { position: relative; z-index: 1; background: var(--raised); border-color: var(--gold); }
+@media (hover: hover) {
+  .row:not([aria-pressed="true"]):hover { border-color: var(--line); }
+}
+.row:focus-visible { position: relative; z-index: 2; outline-offset: 0; outline-color: var(--text); }
+
+/* phones: two lines, the number in one column on the first */
+@media (max-width: 599px) {
+  .row { grid-template-columns: 32px minmax(0, 1fr) auto; column-gap: 10px; row-gap: 0; align-items: center; }
+  .row .ico { grid-row: 1 / span 2; }
+  .row .who { grid-column: 2; grid-row: 1; flex-direction: row; align-items: baseline; gap: 6px; }
+  .row .sol { grid-column: 3; grid-row: 1; text-align: right; }
+  .row .st { grid-column: 2 / span 2; grid-row: 2; }
+}
+@media (min-width: 600px) {
+  .row { font-size: 15px; }
+}
+@media (min-width: 1000px) {
+  .mol { grid-template-columns: minmax(0, 1fr) 300px; column-gap: 40px; align-items: start; }
+  .facts { padding-top: 4px; }
+}
+@media (min-width: 600px) and (min-aspect-ratio: 11/10) and (max-width: 1199px),
+       (min-width: 480px) and (min-aspect-ratio: 11/10) and (max-height: 559px) {
+  .sub main.coins { padding: 28px calc(32px + env(safe-area-inset-right, 0px)) 48px calc(32px + env(safe-area-inset-left, 0px)); }
+}
+@media (min-width: 1200px) and (min-height: 560px) {
+  .sub main.coins { padding: 36px 40px 64px; }
+}
+
+/* ---------- /coins: a coin's image, 32 px, beside its name ---------- */
+
+.coin-img { display: block; width: 32px; height: 32px; object-fit: cover; background: var(--raised); }
+.fx-head { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.fx-head h2 { min-width: 0; }
+.facts > div > .fx-head + * { margin-top: 8px; }
+
+/* ---------- /launch: the form beside its live gauge (body.sub, main.launch) ----------
+   PHONES: one column in reading order: the title, the fields, the gauge with its line under it, the facts and the
+   button. From 760px, or 540px in landscape: the gauge stands in a column of its own beside all of that, sticky, at
+   4 or 8 px a cell, so it stays in view while the first buy is typed. launch.js draws it; nothing here moves. */
+
+.sub main.launch { align-content: start; row-gap: 28px; }
+.l-top > * + * { margin-top: 18px; }
+
+.l-form fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.l-f + .l-f { margin-top: 20px; }
+/* name and symbol share one border, as the site's other controls do; the one in front shows its whole frame */
+.l-two { display: grid; grid-template-columns: minmax(0, 1fr) 140px; }
+.l-two .l-f + .l-f { margin: 0 0 0 -1px; }
+.l-two + .l-f { margin-top: 20px; }
+.l-two .l-in[aria-invalid="true"] { position: relative; z-index: 1; }
+.l-two .l-in:focus { position: relative; z-index: 2; }
+.l-lab { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.l-lab label { color: var(--text); font-weight: 500; font-size: 14px; line-height: 1.4; }
+.l-count { flex: none; font-size: 12px; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.l-in {
+  display: block;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--raised);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.2;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.l-in[aria-invalid="true"] { border-color: var(--orange); }
+.l-in:focus { border-color: var(--gold); outline: 1px solid var(--gold); outline-offset: 0; }
+.l-form fieldset:disabled .l-in { color: var(--muted); -webkit-text-fill-color: var(--muted); opacity: 1; }
+.l-err { position: relative; margin-top: 6px; padding-left: 12px; color: var(--text); font-size: 13px; line-height: 1.5; }
+.l-err::before { content: ""; position: absolute; left: 0; top: 7px; width: 6px; height: 6px; background: var(--orange); }
+
+/* the image: 96 px in a frame of 3 px dots; the input itself is visually hidden and keeps the keyboard */
+.l-pick { position: relative; display: flex; align-items: center; gap: 14px; }
+.l-frame { position: relative; display: block; flex: none; width: 102px; height: 102px; padding: 3px; cursor: pointer; }
+.l-frame svg { position: absolute; top: 0; left: 0; width: 102px; height: 102px; }
+.l-well { display: block; width: 96px; height: 96px; background: var(--raised); }
+.l-well img { display: block; width: 96px; height: 96px; object-fit: cover; }
+.l-note { min-width: 0; font-size: 13px; line-height: 1.5; }
+.l-pick input:focus + .l-frame { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (hover: hover) {
+  .l-form fieldset:not(:disabled) .l-frame:hover .l-well { background: var(--line-3); }
+}
+.l-form fieldset:disabled .l-frame { cursor: default; }
+
+.l-go > * + * { margin-top: 12px; }
+.l-facts { font-size: 14px; line-height: 1.5; }
+.l-facts li + li { margin-top: 6px; }
+.l-facts li::before { top: 8px; }
+.l-line { font-size: 14px; line-height: 1.5; }
+.l-go > .l-lines { margin-top: 0; }
+.l-lines > :not([hidden]) { margin-top: 12px; }
+#l-bal-err, #l-low, #l-why { color: var(--text); }
+.l-step, .l-err, .l-line { overflow-wrap: anywhere; }
+.l-go a, .l-done a {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.l-go .l-btn {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 18px;
+  padding: 10px 14px;
+  border: 1px solid var(--gold);
+  border-radius: 0;
+  background: var(--gold);
+  color: var(--page);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.3;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.l-go .l-btn:disabled { border-color: var(--line); background: var(--raised); color: var(--muted); cursor: default; }
+@media (hover: hover) {
+  .l-go .l-btn:not(:disabled):hover { border-color: var(--text); background: var(--text); }
+}
+.l-step { min-height: 21px; color: var(--text); font-size: 14px; line-height: 1.5; }
+
+.l-done > * + * { margin-top: 12px; }
+.l-done h2 { overflow-wrap: anywhere; }
+.l-done h2:focus { outline: none; }
+
+@media (min-width: 760px), (min-width: 540px) and (min-aspect-ratio: 11/10) {
+  .sub main.launch { grid-template-columns: 140px minmax(0, 440px); align-items: start; }
+  .sub main.launch .l-art {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    position: sticky;
+    top: 24px;
+  }
+  .l-top, .l-form, .l-go, .l-done { grid-column: 2; }
+  .l-top { grid-row: 1; }
+  .l-form { grid-row: 2; }
+  .l-go { grid-row: 3; }
+  .l-done { grid-row: 2 / span 2; }
+}
+@media (min-width: 1000px) {
+  .sub main.launch { grid-template-columns: 280px minmax(0, 440px); }
+  .sub main.launch .art .drawing { width: 280px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cue .drop { animation: none; }
+}

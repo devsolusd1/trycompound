@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Coins · Compound</title>
+  <meta name="description" content="Every coin launched on Compound, drawn as an atom around the Compound token: its nucleus is the SOL in its curve or pool. With a plain list to scan and sort.">
+  <meta name="theme-color" content="#12121C">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Crect width='7' height='7' fill='%2312121C'/%3E%3Crect x='1' y='1' width='4' height='4' fill='%23F5BD00'/%3E%3Crect x='5' y='1' width='1' height='4' fill='%236E45FF'/%3E%3Crect x='1' y='5' width='5' height='1' fill='%239595B2'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:ROND,wght@0..100,100..900&family=Instrument+Sans:wght@400;500&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script src="wallet.js" defer></script>
+  <script src="coins.js" defer></script>
+</head>
+<body class="sub">
+  <header class="head">
+    <a class="wordmark" id="wordmark" href="/"><svg class="px mark" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><rect x="0" y="0" width="4" height="1" fill="#F5BD00"/><rect x="4" y="0" width="1" height="1" fill="#6E45FF"/><rect x="0" y="1" width="4" height="1" fill="#F5BD00"/><rect x="4" y="1" width="1" height="1" fill="#6E45FF"/><rect x="0" y="2" width="4" height="1" fill="#F5BD00"/><rect x="4" y="2" width="1" height="1" fill="#6E45FF"/><rect x="0" y="3" width="4" height="1" fill="#F5BD00"/><rect x="4" y="3" width="1" height="1" fill="#6E45FF"/><rect x="0" y="4" width="5" height="1" fill="#9595B2"/></svg><span>compound</span></a>
+    <nav class="pages" aria-label="Pages">
+      <a href="/coins" aria-current="page"><svg class="px ico" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><rect x="0" y="0" width="2" height="1" fill="#F5BD00"/><rect x="0" y="1" width="1" height="1" fill="#F5BD00"/><rect x="1" y="1" width="1" height="1" fill="#F54B00"/><rect x="2" y="1" width="1" height="1" fill="#2A2A3C"/><rect x="3" y="2" width="2" height="1" fill="#6E45FF"/><rect x="2" y="3" width="1" height="1" fill="#2A2A3C"/><rect x="3" y="3" width="2" height="1" fill="#6E45FF"/><rect x="0" y="4" width="1" height="1" fill="#F5BD00"/><rect x="1" y="4" width="1" height="1" fill="#2A2A3C"/></svg><span class="lbl">coins</span></a>
+      <a href="/launch"><svg class="px ico" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><rect x="1" y="0" width="1" height="1" fill="#F5BD00"/><rect x="2" y="0" width="2" height="1" fill="#2A2A3C"/><rect x="0" y="1" width="1" height="1" fill="#F5BD00"/><rect x="4" y="1" width="1" height="1" fill="#2A2A3C"/><rect x="0" y="2" width="1" height="1" fill="#F5BD00"/><rect x="2" y="2" width="1" height="1" fill="#F5BD00"/><rect x="4" y="2" width="1" height="1" fill="#2A2A3C"/><rect x="0" y="3" width="1" height="1" fill="#F5BD00"/><rect x="4" y="3" width="1" height="1" fill="#2A2A3C"/></svg><span class="lbl">launch</span></a>
+    </nav>
+    <div class="wallet" id="wallet" hidden>
+      <button id="connect" type="button" aria-expanded="false" aria-controls="wallet-panel">connect</button>
+      <div class="panel" id="wallet-panel" hidden></div>
+    </div>
+  </header>
+
+  <main class="coins" id="coins-main" data-api="/api/coins">
+    <div class="coins-top">
+      <h1>Coins</h1>
+      <p class="status" id="status">Reading the chain...</p>
+      <p class="fine" id="note" hidden></p>
+      <p class="fine" id="waiting" hidden>Your new coin isn&rsquo;t listed yet. It will show here within a minute.</p>
+      <p class="fine" id="stale" hidden></p>
+    </div>
+
+    <div class="mol">
+      <figure class="mol-fig">
+        <div class="mol-box" id="mol-box"><canvas id="mol" width="128" height="128" role="img" aria-label="The Compound token alone in the middle."></canvas></div>
+        <figcaption class="fine" id="shown" hidden></figcaption>
+      </figure>
+
+      <div class="facts" id="facts">
+        <p class="vh" id="fx-live" aria-live="polite"></p>
+
+        <div id="fx-key">
+          <ul class="key">
+            <li><span class="sw" id="sw-centre"></span><span>In the middle, the Compound token. <span id="key-centre-soon">Coming soon.</span><span id="key-centre-live" hidden>The real one is coming soon; on devnet a test stand-in takes its place.</span></span></li>
+            <li><span class="sw" id="sw-curve"></span><span>A coin on its curve, not bonded. Its lit dots show how far the curve has filled.</span></li>
+            <li><span class="sw" id="sw-grad"></span><span>A graduated coin, in its own pool. Its bond stands for the 16% of that pool&rsquo;s fee meant to buy Compound back and burn it. <span id="key-grad-soon">No real buyback runs yet.</span><span id="key-grad-live" hidden>On devnet that is being tested: test SOL buys the stand-in, which is then burned.</span></span></li>
+          </ul>
+          <p class="fine">A nucleus is the SOL in the coin&rsquo;s curve or pool; each size up is about twice the SOL. Pick an atom, or a coin in the list, to see its numbers.</p>
+          <button type="button" class="tog" id="key-open" hidden>see the buyback figures</button>
+        </div>
+
+        <div id="fx-coin" hidden>
+          <div class="fx-head"><span id="fx-img" hidden></span><h2 id="fx-name" tabindex="-1"></h2></div>
+          <p class="fx-sym" id="fx-sym"></p>
+          <p class="white" id="fx-state"></p>
+          <dl class="fx">
+            <div><dt id="fx-sol-l">SOL in its pool</dt><dd id="fx-sol"></dd></div>
+            <div><dt id="fx-mc-l">SOL market cap</dt><dd id="fx-mc"></dd></div>
+            <div id="fx-grad-row"><dt>SOL in its curve to graduate</dt><dd id="fx-grad"></dd></div>
+            <div id="fx-floor-row"><dt>SOL floor</dt><dd id="fx-floor"></dd></div>
+          </dl>
+          <p class="fine" id="fx-floor-note">The floor is the least SOL that would stay in the pool&rsquo;s locked liquidity if every token were sold into it. Counted in SOL, it never falls: that liquidity is locked for good and part of every trade&rsquo;s fee in this pool stays in it. The price can still fall.</p>
+          <div class="fx-mint"><span>Mint</span><code id="fx-mint"></code><button type="button" class="tog" id="fx-copy">copy</button></div>
+          <p><a id="fx-scan" href="https://solscan.io" target="_blank" rel="noopener noreferrer">See it on Solscan</a></p>
+          <p class="fine" id="fx-off" hidden></p>
+        </div>
+
+        <div id="fx-centre" hidden>
+          <h2 id="fxc-h" tabindex="-1">Compound</h2>
+          <p>The token in the middle. Every graduated coin is bonded to it: 16% of each pool&rsquo;s fee is meant to buy it back and burn it.</p>
+          <p class="white" id="fxc-state" hidden></p>
+          <dl class="fx" id="fxc-figures" hidden>
+            <div><dt>test tokens the buyback wallet holds</dt><dd id="fxc-held"></dd></div>
+            <div><dt>test tokens burned</dt><dd id="fxc-burned"></dd></div>
+            <div><dt>SOL waiting to buy</dt><dd id="fxc-pot"></dd></div>
+            <div><dt>SOL market cap</dt><dd id="fxc-mc"></dd></div>
+          </dl>
+          <p class="fine" id="fxc-old" hidden>These token figures are from an earlier read.</p>
+          <p id="fxc-wallet" hidden><a id="fxc-scan" href="https://solscan.io" target="_blank" rel="noopener noreferrer">See the buyback wallet on Solscan</a></p>
+          <p class="fine" id="fxc-fine-soon">The Compound token is coming soon, so no real buyback runs yet.</p>
+          <p class="fine" id="fxc-fine-live" hidden>On devnet, a test stand-in called <span id="fxc-name"></span> takes its place. The real Compound token is coming soon, so no real buyback runs yet.</p>
+        </div>
+
+        <div id="fx-empty" hidden>
+          <p>When coins do, each shows up here as an atom: its nucleus is the SOL in its curve or pool. A graduated coin is bonded to the Compound token by one thing only: the 16% of its pool&rsquo;s fee meant to buy Compound back and burn it. Coins don&rsquo;t share liquidity.</p>
+          <p class="fine">The Compound token is coming soon.</p>
+        </div>
+      </div>
+    </div>
+
+    <section class="list" id="list" aria-labelledby="list-h" hidden>
+      <div class="list-head">
+        <h2 id="list-h">Every coin</h2>
+        <div class="sort" role="group" aria-label="Sort the list">
+          <button type="button" class="tog" id="sort-deep" aria-pressed="true">deepest</button>
+          <button type="button" class="tog" id="sort-new" aria-pressed="false">newest</button>
+        </div>
+      </div>
+      <ol class="rows" id="rows"></ol>
+    </section>
+
+    <noscript><p class="fine">This page reads the coins from the chain with JavaScript, which is off.</p></noscript>
+  </main>
+
+  <p class="foot"><span>compound</span> · Built on Meteora's bonding curve and DAMM v2 pools. Not made or endorsed by Meteora.</p>
+</body>
+</html>

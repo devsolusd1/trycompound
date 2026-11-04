@@ -1,0 +1,20 @@
+{
+  "devnet": ["CVo2E8M26oKV5PXu41F4N2hrQMoJnStpkpUGcbqFxb89", "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo"],
+  "mainnet": [],
+  "demoSize": ["4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo"],
+  "launch": { "devnet": "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo", "mainnet": "5Dd9kGLrGcJdrLey8aYvA5VranGWkbbMP2XzgAJCKH4e" },
+  "official": {
+    "devnet": {
+      "mint": "2B2UVxJCsxYy7H9mfE7BR5DhJjbYdbSVexxjrNycvEAA",
+      "config": "FoMX15tFZVsoRhEcPDwSxCgmn327Pjkd8iPn6UM85d5M",
+      "pool": "FvMdzmcrkbbFRE9NFdPXTMvaNydsSUKv8RRhPtNwsceE",
+      "wallet": "46An73dhwvEgfZfzJyJXZ9HLTwhPTE5GAiqNBDFADHi6",
+      "pot": "EN67tmpkWjReeoqBiev55CEdCcwu8Pt9Rvt6W18LoC97",
+      "tokenAccount": "7ZeT2ZeUHxg1s33rjTP2symVYTopX6k2WqcNXoT6PPaj",
+      "symbol": "CSTAND",
+      "name": "Compound Stand-in",
+      "test": true
+    },
+    "mainnet": null
+  }
+}
