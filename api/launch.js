@@ -486,7 +486,11 @@ module.exports = endpoint("launch", async (req) => {
     if (error instanceof Refuse) throw error;
     // web3.js gives a node that fails as a plain Error: the cause goes to the log, scrubbed, and the visitor is told. A
     // library that fails to load is not the node, even when its name says socket (rpc-websockets).
-    if (/require\(\)|cannot find module|ERR_REQUIRE|ERR_MODULE/i.test(String(error?.message))) throw error;
+    if (/require\(\)|cannot find module|ERR_REQUIRE|ERR_MODULE/i.test(String(error?.message))) {
+      console.error(`api/launch: a library failed to load on Node ${process.version}: ${scrub(error?.message ?? error)}`);
+      // TEMPORARY, as the node detail below: says which Node runs and the failure's first words, scrubbed
+      throw new Refuse(500, "library", `A library failed to load on Node ${process.version}. [${scrub(String(error?.message ?? error)).slice(0, 200)}]`);
+    }
     if (!/fetch|network|timed? ?out|socket|econn|429|50[234]|failed to get/i.test(String(error?.message))) throw error;
     console.error(`api/launch: ${scrub(error?.message ?? error)}`);
     // What kind of failure, in words that can't carry the node's address or key: an HTTP status, a socket error's name,
