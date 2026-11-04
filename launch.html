@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="style.css">
   <script src="wallet.js" defer></script>
   <script src="launch.js" defer></script>
+  <script src="token.js" defer></script>
 </head>
 <body class="sub">
   <header class="head">
@@ -30,6 +31,11 @@
 
   <main class="launch" id="launch-main" data-launch="/api/launch" data-upload="/api/upload">
     <div class="l-top">
+      <div class="tok" aria-label="The Compound token">
+        <p class="tok-h"><svg class="px" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><rect x="0" y="0" width="4" height="4" fill="#F5BD00"/><rect x="4" y="0" width="1" height="4" fill="#6E45FF"/><rect x="0" y="4" width="5" height="1" fill="#9595B2"/></svg><span class="tok-sym">$COMPOUND</span><span class="tok-live">live on Solana</span></p>
+        <div class="fx-mint tok-ca"><span>CA</span><code>BpWuEs3xUjQJ7ft53Szpm31Xe535RLNAvnka9a2z4hD2</code><button type="button" class="tog" data-copy="BpWuEs3xUjQJ7ft53Szpm31Xe535RLNAvnka9a2z4hD2">copy</button></div>
+        <p class="tok-links"><a href="https://jup.ag/tokens/BpWuEs3xUjQJ7ft53Szpm31Xe535RLNAvnka9a2z4hD2" target="_blank" rel="noopener noreferrer">Buy on Jupiter</a><a href="https://dexscreener.com/solana/BpWuEs3xUjQJ7ft53Szpm31Xe535RLNAvnka9a2z4hD2" target="_blank" rel="noopener noreferrer">Chart</a><a href="/coins#BpWuEs3xUjQJ7ft53Szpm31Xe535RLNAvnka9a2z4hD2">Buybacks and burns</a></p>
+      </div>
       <h1>Launch a coin</h1>
       <p id="l-intro">Launch a coin with your wallet.</p>
     </div>

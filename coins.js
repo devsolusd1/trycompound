@@ -647,7 +647,7 @@
     const when = data.updated != null ? data.updated : Math.floor(lastOk / 1000);
     setText(stale, (failed ? 'Couldn’t refresh; showing data from ' : 'Read from the chain at ') + hhmm(when) + '.');
     show(stale, true);
-    show($('waiting'), !!wanted && !byMint.has(wanted) && Date.now() - openedAt < WAIT_FOR_NEW);
+    show($('waiting'), !!wanted && !byMint.has(wanted) && !(data && data.token && data.token.mint === wanted) && Date.now() - openedAt < WAIT_FOR_NEW);
   }
   function renderCaption() {
     const cap = $('shown'), n = place.shown.length, m = data.coins.length;
@@ -980,7 +980,12 @@
   // The launch page links here at once, and the answer can be up to a minute old, so the line says it is coming. Capped
   // so a bad link doesn't show it for ever.
   const openedAt = Date.now(), WAIT_FOR_NEW = 120000;
-  function selectWanted() { if (wanted && byMint.has(wanted)) select(wanted); }
+  // A link to the token's own mint (the token block on every page) opens its panel in the middle.
+  function selectWanted() {
+    if (!wanted) return;
+    if (byMint.has(wanted)) select(wanted);
+    else if (data && data.token && data.token.mint === wanted && selected !== '@centre') select('@centre');
+  }
   function str(x, max) { return typeof x === 'string' ? x.replace(/[\u0000-\u001F\u007F-\u009F​-‏‪-‮⁦-⁩]/g, '').trim().slice(0, max) : ''; }
   // The token in the middle, whole or not at all: anything off drops it and the page keeps its plain words. A test
   // stand-in on devnet, or the real token on mainnet: never one on the other's cluster, because the words around it

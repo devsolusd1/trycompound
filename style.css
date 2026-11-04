@@ -974,3 +974,20 @@ dl.fx dd {
 @media (prefers-reduced-motion: reduce) {
   .cue .drop { animation: none; }
 }
+
+/* The Compound token, near the top of every page: its ticker, its CA with a copy button, and where to buy it, see its
+   chart and follow its buybacks. A gold frame on the raised colour, the one place the page uses one. */
+.tok { max-width: 520px; padding: 14px 16px 16px; border: 1px solid var(--gold); background: var(--raised); }
+.tok > * + * { margin-top: 12px; }
+.block > .tok { margin-top: 22px; }
+.coins-top > .tok, .l-top > .tok { margin-bottom: 26px; }
+.coins-top > .tok + h1, .l-top > .tok + h1 { margin-top: 0; }
+.tok-h { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.tok-h .px { flex: none; width: 18px; height: 18px; }
+.tok-sym { font-family: var(--dots); font-variation-settings: "ROND" 0; font-synthesis: none; font-weight: 900; font-size: 24px; line-height: 1; color: var(--text); }
+.tok-live { font-size: 12px; line-height: 1.4; color: var(--gold); }
+.tok-ca > span { font-size: 12px; color: var(--muted); }
+.tok-ca code { overflow-wrap: anywhere; }
+.tok-links { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; line-height: 1.4; }
+.tok-links a { color: var(--text); text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 3px; }
+@media (hover: hover) { .tok-links a:hover { color: var(--gold); } }
