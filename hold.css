@@ -73,6 +73,19 @@ h1 {
   text-align: center;
 }
 
+/* the X account, under the line */
+.x {
+  font-family: var(--dots);
+  font-variation-settings: "ROND" 0;
+  font-synthesis: none;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
+  color: #9595B2;
+  text-decoration: none;
+}
+.x:hover, .x:focus-visible { color: var(--text); }
+
 @media (min-width: 900px) {
   .head { height: 78px; padding: 0 40px; }
   .wordmark span { font-size: 22px; }
