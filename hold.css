@@ -1,4 +1,4 @@
-/* Compound, for now: the pixel atom and one line. Flat colours on #12121C. */
+/* Compound, for now: the pixel atom, one line and the X account, nothing above them. Flat colours on #12121C. */
 
 :root {
   --page: #12121C;
@@ -19,7 +19,7 @@ body {
   min-height: 100vh;
   min-height: 100svh;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: 1fr;
   background: var(--page);
   color: var(--text);
 }
@@ -49,7 +49,7 @@ body {
   align-content: center;
   justify-items: center;
   gap: 24px;
-  padding: 0 16px 56px;
+  padding: 16px;
 }
 .atom-slot {
   width: min(100%, 52vh, 512px);
@@ -89,5 +89,4 @@ h1 {
 @media (min-width: 900px) {
   .head { height: 78px; padding: 0 40px; }
   .wordmark span { font-size: 22px; }
-  .hold { padding-bottom: 78px; }
 }
