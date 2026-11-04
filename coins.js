@@ -662,7 +662,7 @@
     const parts = [];
     if (g) parts.push(g + ' graduated coin' + (g === 1 ? '' : 's') + ' bonded to it');
     if (k) parts.push(k + ' coin' + (k === 1 ? '' : 's') + ' on ' + (k === 1 ? 'its' : 'their') + ' curve around it, not bonded');
-    const mid = data.token ? 'a test stand-in for the Compound token' : 'the Compound token';
+    const mid = data.token && data.token.test ? 'a test stand-in for the Compound token' : 'the Compound token';
     canvas.setAttribute('aria-label', !m ? 'The Compound token alone in the middle: no coin yet.'
       : 'A molecule: ' + mid + ' in the middle, ' + parts.join(', and ') + '.');
   }
@@ -789,15 +789,26 @@
   }
 
   /* ------------------------------------------------------------------ the token in the middle */
-  const NO_TOKEN = ['key-centre-soon', 'key-grad-soon', 'fxc-fine-soon'];
-  const WITH_TOKEN = ['key-centre-live', 'key-grad-live', 'key-open', 'fxc-state', 'fxc-figures', 'fxc-wallet', 'fxc-fine-live'];
+  const NO_TOKEN = ['key-centre-soon', 'key-grad-soon', 'fxc-fine-soon', 'fx-empty-soon'];
+  const WITH_TOKEN = ['key-open', 'fxc-state', 'fxc-figures', 'fxc-wallet'];
+  const WITH_TEST = ['key-centre-live', 'key-grad-live', 'fxc-fine-live'];   // the devnet stand-in's words
+  const WITH_REAL = ['key-centre-real', 'fxc-fine-real', 'fxc-token'];        // the real token's, on mainnet
   function renderToken() {
     const t = data && data.token;
     NO_TOKEN.forEach((id) => show($(id), !t));
     WITH_TOKEN.forEach((id) => show($(id), !!t));
+    WITH_TEST.forEach((id) => show($(id), !!t && t.test));
+    WITH_REAL.forEach((id) => show($(id), !!t && !t.test));
     show($('fxc-old'), !!(t && data.tokenOld));
     if (!t) return;
-    setText($('fxc-state'), 'Test stand-in. ' + (t.state === 'graduated' ? 'Graduated' : 'On its curve') + '.');
+    setText($('fxc-state'), (t.test ? 'Test stand-in. ' : '') + (t.state === 'graduated' ? 'Graduated' : 'On its curve') + '.');
+    setText($('fxc-held-l'), (t.test ? 'test ' : '') + 'tokens the buyback wallet holds');
+    setText($('fxc-burned-l'), (t.test ? 'test ' : '') + 'tokens burned');
+    const tokenScan = $('fxc-token-scan');
+    if (tokenScan) {
+      const href = 'https://solscan.io/token/' + encodeURIComponent(t.mint) + (cluster === 'devnet' ? '?cluster=devnet' : '');
+      if (tokenScan.getAttribute('href') !== href) tokenScan.setAttribute('href', href);
+    }
     setText($('fxc-held'), fmtDown(t.heldTokens));
     setText($('fxc-burned'), fmtDown(t.burnedTokens));
     setText($('fxc-pot'), fmtDown(t.potSol));
@@ -814,7 +825,8 @@
   function renderPanel() {
     renderToken();
     const key = $('fx-key'), one = $('fx-coin'), mid = $('fx-centre'), none = $('fx-empty');
-    const empty = !!data && !data.coins.length;
+    // empty only with no coin and no token: the token alone still has its key and its panel
+    const empty = !!data && !data.coins.length && !data.token;
     const c = selected && selected !== '@centre' ? byMint.get(selected) : null;
     show(none, empty);
     show(mid, !empty && selected === '@centre');
@@ -865,7 +877,7 @@
     rowEls.forEach((r, m) => r.b.setAttribute('aria-pressed', String(m === selected)));
     render();
     if (changed && id) {
-      const name = id === '@centre' ? (data && data.token ? 'the test stand-in for Compound' : 'Compound') : displayName(byMint.get(id));
+      const name = id === '@centre' ? (data && data.token && data.token.test ? 'the test stand-in for Compound' : 'Compound') : displayName(byMint.get(id));
       setText($('fx-live'), 'Showing ' + name + '.');
       const fx = $('facts');
       if (fx && fx.getBoundingClientRect) {
@@ -970,15 +982,17 @@
   const openedAt = Date.now(), WAIT_FOR_NEW = 120000;
   function selectWanted() { if (wanted && byMint.has(wanted)) select(wanted); }
   function str(x, max) { return typeof x === 'string' ? x.replace(/[\u0000-\u001F\u007F-\u009F​-‏‪-‮⁦-⁩]/g, '').trim().slice(0, max) : ''; }
-  // The token in the middle, whole or not at all: anything off drops it and the page keeps its plain words. Only a test
-  // token on devnet is shown, because the words around it say that and there are none yet for a real one.
+  // The token in the middle, whole or not at all: anything off drops it and the page keeps its plain words. A test
+  // stand-in on devnet, or the real token on mainnet: never one on the other's cluster, because the words around it
+  // say which it is.
   function cleanToken(t, where) {
-    if (!t || typeof t !== 'object' || where !== 'devnet' || t.test !== true) return null;
+    if (!t || typeof t !== 'object') return null;
+    if (!((where === 'devnet' && t.test === true) || (where === 'mainnet' && t.test !== true))) return null;
     if (t.state !== 'curve' && t.state !== 'graduated') return null;
     if (![t.mint, t.pool, t.wallet].every((x) => typeof x === 'string' && B58.test(x))) return null;
     if (![t.priceSol, t.marketCapSol, t.potSol, t.heldTokens, t.burnedTokens].every((x) => num(x) != null && x >= 0)) return null;
     return {
-      mint: t.mint, name: str(t.name, 64), symbol: str(t.symbol, 16), test: true, state: t.state,
+      mint: t.mint, name: str(t.name, 64), symbol: str(t.symbol, 16), test: where === 'devnet', state: t.state,
       priceSol: t.priceSol, marketCapSol: t.marketCapSol, pool: t.pool, wallet: t.wallet,
       potSol: t.potSol, heldTokens: t.heldTokens, burnedTokens: t.burnedTokens
     };
@@ -1012,11 +1026,12 @@
     };
   }
   function apply(d) {
-    const first = !data;
+    const first = !data, sameCluster = d.cluster === cluster;
     if (d.cluster !== cluster) { cluster = d.cluster; bondCache.clear(); }
     d.coins.forEach((c) => { const was = byMint.get(c.mint); if (c.createdAt == null && was && was.createdAt != null) c.createdAt = was.createdAt; });
-    // the token's read can fail alone, and an open page must not go back to its plain words over that
-    d.tokenOld = !d.token && !!(data && data.token);
+    // the token's read can fail alone, and an open page must not go back to its plain words over that; a token from
+    // the other cluster is never kept, as its words would be the wrong ones
+    d.tokenOld = sameCluster && !d.token && !!(data && data.token);
     if (d.tokenOld) d.token = data.token;
     data = d;
     byMint = new Map(d.coins.map((c) => [c.mint, c]));

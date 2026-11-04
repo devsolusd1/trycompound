@@ -1,8 +1,18 @@
 {
-  "devnet": ["CVo2E8M26oKV5PXu41F4N2hrQMoJnStpkpUGcbqFxb89", "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo"],
-  "mainnet": [],
-  "demoSize": ["4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo"],
-  "launch": { "devnet": "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo", "mainnet": null },
+  "devnet": [
+    "CVo2E8M26oKV5PXu41F4N2hrQMoJnStpkpUGcbqFxb89",
+    "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo"
+  ],
+  "mainnet": [
+    "6vp3KQzZkDajCxn1sY5eryj2brKaCtZJx3t1KRipix9Z"
+  ],
+  "demoSize": [
+    "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo"
+  ],
+  "launch": {
+    "devnet": "4kLkrjDZsqwvq3zq52tqcvTZ8ec6obxeK3JYMisYDvYo",
+    "mainnet": "6vp3KQzZkDajCxn1sY5eryj2brKaCtZJx3t1KRipix9Z"
+  },
   "official": {
     "devnet": {
       "mint": "2B2UVxJCsxYy7H9mfE7BR5DhJjbYdbSVexxjrNycvEAA",
