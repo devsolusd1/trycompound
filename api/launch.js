@@ -488,8 +488,7 @@ module.exports = endpoint("launch", async (req) => {
     // library that fails to load is not the node, even when its name says socket (rpc-websockets).
     if (/require\(\)|cannot find module|ERR_REQUIRE|ERR_MODULE/i.test(String(error?.message))) {
       console.error(`api/launch: a library failed to load on Node ${process.version}: ${scrub(error?.message ?? error)}`);
-      // TEMPORARY, as the node detail below: says which Node runs and the failure's first words, scrubbed
-      throw new Refuse(500, "library", `A library failed to load on Node ${process.version}. [${scrub(String(error?.message ?? error)).slice(0, 200)}]`);
+      throw new Refuse(500, "library", "The launch service could not start. Try again later.");
     }
     if (!/fetch|network|timed? ?out|socket|econn|429|50[234]|failed to get/i.test(String(error?.message))) throw error;
     console.error(`api/launch: ${scrub(error?.message ?? error)}`);
@@ -504,9 +503,6 @@ module.exports = endpoint("launch", async (req) => {
       else if (host === "devnet.helius-rpc.com") kind = "helius devnet";
       else if (host.endsWith("helius-rpc.com")) kind = "helius";
     } catch { kind = "no valid node address"; }
-    // TEMPORARY, while the mainnet test's node is being set up: the failure's own words, scrubbed of the node's address
-    // and key, with anything shaped like a key or an api-key parameter taken out as well.
-    const detail = scrub(said).replace(/api[-_]?key=[^\s&"']*/gi, "api-key=<hidden>").replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, "<hidden>").slice(0, 240);
-    throw new Refuse(502, "node", `The network could not be reached (${why ? `${why}, ` : ""}${kind}). Try again. [${detail}]`);
+    throw new Refuse(502, "node", `The network could not be reached (${why ? `${why}, ` : ""}${kind}). Try again.`);
   }
 });
