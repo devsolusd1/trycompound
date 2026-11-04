@@ -1,7 +1,12 @@
 {
   "name": "compound-site",
   "private": true,
-  "description": "The Compound site: static pages plus the Vercel functions in api/. No \"type\" here on purpose: the functions are CommonJS, and the folder above says module. Node 22 at least: web3.js's rpc-websockets requires uuid 14, which is ES modules only, and only Node 22.12 and later can require() those.",
+  "description": "The Compound site: static pages plus the Vercel functions in api/. No \"type\" here on purpose: the functions are CommonJS, and the folder above says module. web3.js's rpc-websockets asks for uuid 14, which is ES modules only and which Vercel's functions refused to require() even on Node 22, so the override gives it uuid 11, which still ships CommonJS (it uses only v1).",
+  "overrides": {
+    "rpc-websockets": {
+      "uuid": "11.1.0"
+    }
+  },
   "engines": {
     "node": "22.x"
   },
