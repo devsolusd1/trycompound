@@ -487,6 +487,17 @@ module.exports = endpoint("launch", async (req) => {
     // web3.js gives a node that fails as a plain Error: the cause goes to the log, scrubbed, and the visitor is told
     if (!/fetch|network|timed? ?out|socket|econn|429|50[234]|failed to get/i.test(String(error?.message))) throw error;
     console.error(`api/launch: ${scrub(error?.message ?? error)}`);
-    throw new Refuse(502, "node", "The network could not be reached. Try again.");
+    // What kind of failure, in words that can't carry the node's address or key: an HTTP status, a socket error's name,
+    // and which sort of node is set (helius mainnet, helius devnet or other), so a wrong RPC_URL shows from outside.
+    const said = String(error?.message ?? error);
+    const why = (said.match(/\b(401|403|404|429|500|502|503|504)\b/) || said.match(/fetch failed|ENOTFOUND|EAI_AGAIN|ECONNREFUSED|ECONNRESET|timed? ?out/i) || [])[0];
+    let kind = "other node";
+    try {
+      const host = new URL(process.env.RPC_URL).hostname;
+      if (host === "mainnet.helius-rpc.com") kind = "helius mainnet";
+      else if (host === "devnet.helius-rpc.com") kind = "helius devnet";
+      else if (host.endsWith("helius-rpc.com")) kind = "helius";
+    } catch { kind = "no valid node address"; }
+    throw new Refuse(502, "node", `The network could not be reached (${why ? `${why}, ` : ""}${kind}). Try again.`);
   }
 });
