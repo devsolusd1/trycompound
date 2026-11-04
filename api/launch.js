@@ -498,6 +498,9 @@ module.exports = endpoint("launch", async (req) => {
       else if (host === "devnet.helius-rpc.com") kind = "helius devnet";
       else if (host.endsWith("helius-rpc.com")) kind = "helius";
     } catch { kind = "no valid node address"; }
-    throw new Refuse(502, "node", `The network could not be reached (${why ? `${why}, ` : ""}${kind}). Try again.`);
+    // TEMPORARY, while the mainnet test's node is being set up: the failure's own words, scrubbed of the node's address
+    // and key, with anything shaped like a key or an api-key parameter taken out as well.
+    const detail = scrub(said).replace(/api[-_]?key=[^\s&"']*/gi, "api-key=<hidden>").replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, "<hidden>").slice(0, 240);
+    throw new Refuse(502, "node", `The network could not be reached (${why ? `${why}, ` : ""}${kind}). Try again. [${detail}]`);
   }
 });
