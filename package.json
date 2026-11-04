@@ -1,7 +1,10 @@
 {
   "name": "compound-site",
   "private": true,
-  "description": "The Compound site: static pages plus the Vercel functions in api/. No \"type\" here on purpose: the functions are CommonJS, and the folder above says module.",
+  "description": "The Compound site: static pages plus the Vercel functions in api/. No \"type\" here on purpose: the functions are CommonJS, and the folder above says module. Node 22 at least: web3.js's rpc-websockets requires uuid 14, which is ES modules only, and only Node 22.12 and later can require() those.",
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@meteora-ag/dynamic-bonding-curve-sdk": "2.0.0",
     "@solana/web3.js": "1.99.0",
